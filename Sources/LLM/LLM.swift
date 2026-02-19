@@ -1285,7 +1285,8 @@ open class LLM: ObservableObject {
         repeatPenalty: Float = 1.2,
         repetitionLookback: Int32 = 64,
         historyLimit: Int = 8,
-        maxTokenCount: Int32 = 2048
+        maxTokenCount: Int32 = 2048,
+        gpuLayers: Int32? = nil
     ) {
         LLM.silenceLogging()
         self.path = path.cString(using: .utf8)!
@@ -1297,11 +1298,14 @@ open class LLM: ObservableObject {
         self.history = history
         self.repeatPenalty = repeatPenalty
         self.repetitionLookback = repetitionLookback
-        
+
         #if DEBUG
         print("GNERATING WITH SEEED: \(seed)")
         #endif
         var modelParams = llama_model_default_params()
+        if let gpuLayers {
+            modelParams.n_gpu_layers = gpuLayers
+        }
         #if targetEnvironment(simulator)
         modelParams.n_gpu_layers = 0
         #endif
@@ -1347,7 +1351,8 @@ open class LLM: ObservableObject {
         repeatPenalty: Float = 1.2,
         repetitionLookback: Int32 = 64,
         historyLimit: Int = 8,
-        maxTokenCount: Int32 = 2048
+        maxTokenCount: Int32 = 2048,
+        gpuLayers: Int32? = nil
     ) {
         self.init(
             from: url.path,
@@ -1360,10 +1365,11 @@ open class LLM: ObservableObject {
             repeatPenalty: repeatPenalty,
             repetitionLookback: repetitionLookback,
             historyLimit: historyLimit,
-            maxTokenCount: maxTokenCount
+            maxTokenCount: maxTokenCount,
+            gpuLayers: gpuLayers
         )
     }
-    
+
     public convenience init?(
         from url: URL,
         template: Template,
@@ -1375,7 +1381,8 @@ open class LLM: ObservableObject {
         repeatPenalty: Float = 1.2,
         repetitionLookback: Int32 = 64,
         historyLimit: Int = 8,
-        maxTokenCount: Int32 = 2048
+        maxTokenCount: Int32 = 2048,
+        gpuLayers: Int32? = nil
     ) {
         self.init(
             from: url.path,
@@ -1388,7 +1395,8 @@ open class LLM: ObservableObject {
             repeatPenalty: repeatPenalty,
             repetitionLookback: repetitionLookback,
             historyLimit: historyLimit,
-            maxTokenCount: maxTokenCount
+            maxTokenCount: maxTokenCount,
+            gpuLayers: gpuLayers
         )
         self.preprocess = template.preprocess
         self.template = template
@@ -1407,6 +1415,7 @@ open class LLM: ObservableObject {
         repetitionLookback: Int32 = 64,
         historyLimit: Int = 8,
         maxTokenCount: Int32 = 2048,
+        gpuLayers: Int32? = nil,
         updateProgress: @Sendable @escaping (Double) -> Void = { print(String(format: "downloaded(%.2f%%)", $0 * 100)) }
     ) async throws {
         let url = try await huggingFaceModel.download(to: url, as: name) { progress in
@@ -1423,7 +1432,8 @@ open class LLM: ObservableObject {
             repeatPenalty: repeatPenalty,
             repetitionLookback: repetitionLookback,
             historyLimit: historyLimit,
-            maxTokenCount: maxTokenCount
+            maxTokenCount: maxTokenCount,
+            gpuLayers: gpuLayers
         )
         await setupThinkingTokens(from: huggingFaceModel.template)
     }
