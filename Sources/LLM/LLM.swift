@@ -1,6 +1,10 @@
 import Foundation
 import llama
-@_exported import LLMMacros
+
+/// Protocol for structured output generation (replaces macro-based version).
+public protocol Generatable: Codable {
+    static var jsonSchema: String { get }
+}
 
 public enum ThinkingMode: Sendable {
     case none

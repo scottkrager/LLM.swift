@@ -1,6 +1,5 @@
 // swift-tools-version: 5.9
 import PackageDescription
-import CompilerPluginSupport
 
 let package = Package(
     name: "LLM",
@@ -17,45 +16,16 @@ let package = Package(
             targets: ["LLM"]
         )
     ],
-    dependencies: [
-        .package(url: "https://github.com/apple/swift-syntax.git", from: "602.0.0-latest"),
-        .package(url: "https://github.com/apple/swift-testing.git", branch: "main"),
-        .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.1.0")
-    ],
+    dependencies: [],
     targets: [
         .binaryTarget(
             name: "llama",
             path: "llama.cpp/llama.xcframework"
         ),
-        .macro(
-            name: "LLMMacrosImplementation",
-            dependencies: [
-                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
-                .product(name: "SwiftCompilerPlugin", package: "swift-syntax")
-            ],
-            path: "Sources/LLMMacrosImplementation"
-        ),
-        .target(
-            name: "LLMMacros",
-            dependencies: [
-                "LLMMacrosImplementation",
-                .product(name: "SwiftCompilerPlugin", package: "swift-syntax")
-            ],
-            path: "Sources/LLMMacros"
-        ),
         .target(
             name: "LLM",
-            dependencies: ["llama", "LLMMacros"],
+            dependencies: ["llama"],
             path: "Sources/LLM"
-        ),
-        .testTarget(
-            name: "LLMTests",
-            dependencies: [
-                "LLM",
-                "LLMMacros",
-                .product(name: "Testing", package: "swift-testing")
-            ],
-            path: "Tests/LLMTests"
         )
     ]
 )
