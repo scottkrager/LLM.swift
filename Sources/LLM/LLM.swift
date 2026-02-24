@@ -138,7 +138,7 @@ public actor LLMCore {
         contextParams.n_batch = contextParams.n_ctx
         contextParams.n_threads = processorCount
         contextParams.n_threads_batch = processorCount
-        contextParams.embeddings = true
+        contextParams.embeddings = false
         self.params = contextParams
         
         guard let context = llama_init_from_model(model, params) else {
